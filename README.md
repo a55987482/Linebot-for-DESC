@@ -1,5 +1,6 @@
 # Linebot- for-DESC
 ### Step 1. Clone 專案
+##### # Github : https://github.com/a55987482/Linebot-for-DESC
 ##### # Clone 專案到桌面，並確認電腦內的 Python 版本是否為 Python3 。
 ##### # 安裝 Linebot 所需的套件。
 ```
