@@ -22,7 +22,7 @@ line_bot_api = LineBotApi('+5Se7QxI/1X2qS9YpAX4b6wbDkAk37NdO/TvT6QnleE+ZEtGQsnXm
 handler = WebhookHandler('fae5bfce57cf19d935cb2a11d71982c5')
 
 # 監聽所有來自 /callback 的 Post Request
-@app.route("/callback", methods=['POST'])
+@blueprint.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
