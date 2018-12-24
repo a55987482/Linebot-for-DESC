@@ -34,11 +34,6 @@ line_bot_api = LineBotApi('+5Se7QxI/1X2qS9YpAX4b6wbDkAk37NdO/TvT6QnleE+ZEtGQsnXm
 # Channel Secret
 handler = WebhookHandler('fae5bfce57cf19d935cb2a11d71982c5')
 
-# 監聽所有來自 /callback 的 Post Request
-@blueprint.route("/from_raspi", methods=['GET'])
-def from_raspi():
-    return 'Hi'
-
 
 # 監聽所有來自 /callback 的 Post Request
 @blueprint.route("/callback", methods=['POST'])
