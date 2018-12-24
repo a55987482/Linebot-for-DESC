@@ -8,11 +8,23 @@ from linebot import (
 from linebot.exceptions import (
     InvalidSignatureError
 )
+
+from linebot.models import (
+    FollowEvent
+)
+
+from linebot.models import (
+    UnfollowEvent
+)
+
 from linebot.models import *
+# from model.userInfo import userinfo
 
 import requests
 import config
 import json
+import time
+from time import gmtime,strftime
 
 app = Flask(__name__)
 
@@ -39,6 +51,13 @@ def callback():
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    user_profile = line_bot_api.get_profile(event.source.user_id)
+    if event.message.text == '早安':
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='早安 ' + user_profile.display_name)
+            )
+
     # 確認選單按鈕設計
     command_options_function = {
     '開啟風扇': '6',
@@ -272,3 +291,13 @@ def Menu_template(event):
     )
     )
     line_bot_api.reply_message(event.reply_token, Carousel_template)
+
+# 告知handle，如果收到FollowEvent，則做下面的方法處理
+@handler.add(FollowEvent)
+def reply_text_and_get_user_profile(event):
+    user_profile = line_bot_api.get_profile(event.source.user_id)
+    date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='早安 '+ user_profile.display_name + '\n' + '現在時間：' +  date)
+            )
