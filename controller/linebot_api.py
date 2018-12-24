@@ -21,6 +21,7 @@ from linebot.models import *
 # from model.userInfo import userinfo
 
 import requests
+import pymysql
 import config
 import json
 import time
@@ -32,6 +33,12 @@ app = Flask(__name__)
 line_bot_api = LineBotApi('+5Se7QxI/1X2qS9YpAX4b6wbDkAk37NdO/TvT6QnleE+ZEtGQsnXmSpyM5GbSJwUJLS+75uIKdacfrCgoe6FtujQpS7VTgnZWo+qII9hQqvvuzSRLWYGg/XKguD3tJBACfISEcEBcSXZPAMjOsU0LAdB04t89/1O/w1cDnyilFU=')
 # Channel Secret
 handler = WebhookHandler('fae5bfce57cf19d935cb2a11d71982c5')
+
+# 監聽所有來自 /callback 的 Post Request
+@blueprint.route("/from_raspi", methods=['GET'])
+def from_raspi():
+    return 'Hi'
+
 
 # 監聽所有來自 /callback 的 Post Request
 @blueprint.route("/callback", methods=['POST'])
@@ -82,6 +89,10 @@ def handle_message(event):
             data = json.dumps(dic_data)
             print(data)
             response = requests.post(url=config.url, data=data, headers=config.headers)
+            line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="沒問題！\n\n已收到: " + key )
+                    )
 
     # find event message get dict index 
     menu_options_function = [
@@ -168,6 +179,7 @@ def Fan_speed(event):
         )
     )
     line_bot_api.reply_message(event.reply_token, buttons_template)
+    
 
 # 燈具開關按鈕
 def Light_switch(event):
@@ -189,6 +201,7 @@ def Light_switch(event):
             ]
         )
     )
+
     line_bot_api.reply_message(event.reply_token,Confirm_template)
 
 #亮度選擇按鈕
@@ -223,6 +236,7 @@ def Light_brightness(event):
         )
     )
     line_bot_api.reply_message(event.reply_token, buttons_template)
+
 
 # 一鍵關閉設備按鈕
 def One_button_off(event):
@@ -299,5 +313,49 @@ def reply_text_and_get_user_profile(event):
     date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text='早安 '+ user_profile.display_name + '\n' + '現在時間：' +  date)
+            TextSendMessage(text='您好 '+ user_profile.display_name + '\n' + '現在時間：' +  date)
             )
+
+    # 打开数据库连接
+    db = pymysql.connect(host='127.0.0.1',
+                         user='iiiedu',
+                         password='hellohello',
+                         db='linebot',
+                         port=3306
+                        )
+
+    # 使用 cursor() 方法创建一个游标对象 cursor
+    cursor = db.cursor()
+
+    # 使用 execute()  方法执行 SQL 查询 
+    cursor.execute('INSERT INTO user_profile(user_id,display_name,picture_url,follow_time) VALUES (\''+user_profile.user_id+'\',\''+user_profile.display_name+'\',\''+user_profile.picture_url+'\',\''+date+'\')')
+
+    # 使用 fetchone() 方法获取单条数据.
+    data = cursor.fetchone()
+
+    # 关闭数据库连接
+    db.commit()
+    print ("Records created successfully")
+    db.close()
+
+# @handler.add(UnfollowEvent)
+# def user_unfollow_delete_userInfo(event):
+#     db = pymysql.connect(host='192.168.0.103',
+#                          user='iiiedu',
+#                          password='hellohello',
+#                          db='linebot'
+#                         )
+#     cursor = db.cursor()
+#     print ("DELETE FROM user_profile WHERE user_id = '{}'".format(event.source.user_id))
+#     cursor.execute("DELETE FROM user_profile WHERE user_id = '{}'".format(event.source.user_id))
+#     data = cursor.fetchone()
+#     db.commit()
+#     print ("Records created successfully")
+#     db.close()
+
+
+
+
+
+
+
